@@ -74,31 +74,25 @@ class UsersController extends Controller
     public function create(Request $req){
         //validate the info, create rules for the inputs
         $this->rules = array_merge($this->rules, [
-            'fullname' => 'required|min:3',
+            'username' => 'required|min:3',
+            'name' => 'required|min:3',
             'phone' => 'required|min:10',
             'email' => 'min:3|email:rfc,dns',
-            'avatar' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'bgImg' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'confirmpassword' => 'required|same:password|min:3']
+            'confirmPassword' => 'required|same:password|min:3']
         );
 
         $this->messages = array_merge($this->messages, [
-            'fullname.required' => 'Name is required',
-            'fullname.min' => 'Name length at least 3 characters',
+            'username.required' => 'Name is required',
+            'username.min' => 'Name length at least 3 characters',
+
+            'name.required' => 'Name is required',
+            'name.min' => 'Name length at least 3 characters',
             'phone.required' => 'Phone is required',
             'email.email' => 'Wrong email format!!!',
-    
-            'avatar.image' => 'Should be an image',
-            'avatar.mimes'=> 'Image extension should be: jpeg,png,jpg,gif,svg',
-            'avatar.max'=> 'Image max size is 2MB',
-    
-            'bgImg.image' => 'Should be an image',
-            'bgImg.mimes'=> 'Image extension should be: jpeg,png,jpg,gif,svg',
-            'bgImg.max'=> 'Image max size is 2MB',
 
-            'confirmpassword.required' => 'Confirm password is required',
-            'confirmpassword.same' => 'Confirm password and password does not match.',
-            'confirmpassword.min' => 'Confirm password length at least 3 characters'
+            'confirmPassword.required' => 'Confirm password is required',
+            'confirmPassword.same' => 'Confirm password and password does not match.',
+            'confirmPassword.min' => 'Confirm password length at least 3 characters'
         ]
         );
 
@@ -118,28 +112,11 @@ class UsersController extends Controller
                                 $adminInfo->username = $req->input('username');
                                 $adminInfo->password =  Hash::make( $req->input('password'));
                 
-                                $adminInfo->name = $req->input('fullname');
+                                $adminInfo->name = $req->input('name');
                                 $adminInfo->email = $req->input('email');
                                 $adminInfo->phone = $req->input('phone');
                                 $adminInfo->save();
                             
-                                if ($req->hasFile('img')) { // var name
-                                    $filename = pathinfo($req->img->getClientOriginalName(), PATHINFO_FILENAME);
-                                    $imageName = $adminInfo->id. '_' . $filename . '_' . time() . '.' . $req->img->extension();
-                                    $req->img->move(public_path('data/admins/avatar'), $imageName);
-                                    //update DB
-                                    $adminInfo->avatar = $imageName; // col name
-                                    $adminInfo->save();
-                                }
-
-                                if ($req->hasFile('bg')) { // var name
-                                    $filename = pathinfo($req->bg->getClientOriginalName(), PATHINFO_FILENAME);
-                                    $imageName = $adminInfo->id. '_' . $filename . '_' . time() . '.' . $req->bg->extension();
-                                    $req->bg->move(public_path('data/admins/bg-images'), $imageName);
-                                    //update DB
-                                    $adminInfo->bgimg = $imageName; // col name
-                                    $adminInfo->save();
-                                }
                             }
                             catch (Throwable $e){
                                 return BaseResult::error(500,$e->getMessage());
@@ -148,10 +125,7 @@ class UsersController extends Controller
                             $data = [
                                 'id' => $adminInfo->id,
                                 'username' => $adminInfo->username,
-                                'fullName' => $adminInfo->name,
-                                'avatar' => $adminInfo->avatar,
-                                'bgImg' => $adminInfo->bgimg,
-                                'email'=> $adminInfo-> email,
+                                'name' => $adminInfo->name,
                                 'phone'=> $adminInfo-> phone,
                                 'token' => $adminInfo->api_token,
                             ];
@@ -177,7 +151,7 @@ class UsersController extends Controller
         $rules = array(
             'password' => 'required|min:3',
             'newpassword' => 'required|min:3',
-            'confirmpassword' => 'required|same:newpassword|min:3'
+            'confirmPassword' => 'required|same:newpassword|min:3'
         );
 
         $messages = array(
@@ -187,9 +161,9 @@ class UsersController extends Controller
             'newpassword.required' => 'New password is required',
             'newpassword.min' => 'New password length at least 3 characters',
 
-            'confirmpassword.required' => 'Confirm password is required',
-            'confirmpassword.same' => 'Confirm password and new password does not match.',
-            'confirmpassword.min' => 'Confirm password length at least 3 characters'
+            'confirmPassword.required' => 'Confirm password is required',
+            'confirmPassword.same' => 'Confirm password and new password does not match.',
+            'confirmPassword.min' => 'Confirm password length at least 3 characters'
         );
 
         $validator = Validator::make($req->all(), $rules, $messages);
